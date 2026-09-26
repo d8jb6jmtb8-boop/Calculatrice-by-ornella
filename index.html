@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f8dce8">
+<title>Scientific Calculator Pro</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+    --bg:#f8dce8;
+    --panel:#fff5f9;
+    --screen:#fffafd;
+    --key:#ffffff;
+    --key2:#f5e3eb;
+    --pink:#e78caf;
+    --pink-dark:#c95f87;
+    --text:#432b36;
+    --muted:#987783;
+    --danger:#e58ba8;
+    --shadow:0 10px 30px rgba(170,90,120,.14);
+}
+
+*{
+    scrollbar-width:thin;
+    scrollbar-color:#e5a5bb transparent;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    background:linear-gradient(145deg,#f9e5ed,#f5d3e0);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:14px;
+}
+
+.calculator{
+    width:min(100%,720px);
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.9);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+
+/* TOP */
+
+.topbar{
+    padding:18px 20px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.brand{
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:1.2px;
+}
+
+.top-actions{
+    display:flex;
+    gap:8px;
+}
+
+.small-btn{
+    border:0;
+    background:#fff;
+    color:var(--pink-dark);
+    padding:8px 11px;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(150,80,110,.08);
+}
+
+.small-btn:active{
+    transform:scale(.95);
+}
+
+/* MODE */
+
+.modes{
+    display:flex;
+    gap:8px;
+    padding:8px 18px 14px;
+}
+
+.mode{
+    border:0;
+    background:var(--key2);
+    color:var(--muted);
+    padding:7px 13px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.mode.active{
+    background:var(--pink);
+    color:white;
+}
+
+/* SCREEN */
+
+.screen{
+    margin:0 16px 14px;
+    background:var(--screen);
+    border-radius:22px;
+    min-height:150px;
+    padding:16px;
+    box-shadow:inset 0 0 0 1px rgba(215,150,175,.15);
+    overflow:hidden;
+}
+
+.screen-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:11px;
+    color:var(--muted);
+    font-weight:700;
+}
+
+.expression{
+    margin-top:25px;
+    min-height:30px;
+    text-align:right;
+    font-size:22px;
+    word-break:break-all;
+    color:#76515f;
+}
+
+.result{
+    margin-top:5px;
+    min-height:45px;
+    text-align:right;
+    font-size:36px;
+    font-weight:800;
+    color:#3e2731;
+    word-break:break-all;
+}
+
+/* MEMORY */
+
+.memory-row{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:7px;
+    padding:0 16px 10px;
+}
+
+.mem-btn{
+    border:0;
+    background:#f3dce5;
+    color:#7d4c60;
+    padding:9px 3px;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.mem-btn:active{
+    transform:scale(.96);
+}
+
+/* KEYBOARD */
+
+.keyboard{
+    padding:6px 16px 18px;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:8px;
+    margin-bottom:8px;
+}
+
+button.key{
+    min-height:54px;
+    border:0;
+    border-radius:15px;
+    background:var(--key);
+    color:var(--text);
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(120,65,90,.08);
+    transition:transform .08s,background .12s;
+}
+
+button.key:active{
+    transform:scale(.94);
+    background:#f6e1e9;
+}
+
+button.key.function{
+    background:#f3e0e8;
+    color:#884f67;
+    font-size:13px;
+}
+
+button.key.operator{
+    background:#f0c5d5;
+    color:#713a52;
+}
+
+button.key.action{
+    background:var(--pink);
+    color:white;
+}
+
+button.key.danger{
+    background:#e9a1b9;
+    color:white;
+}
+
+button.key.equal{
+    background:#cc668e;
+    color:white;
+}
+
+button.key.wide{
+    grid-column:span 2;
+}
+
+/* HISTORY */
+
+.history-panel{
+    position:fixed;
+    inset:0;
+    background:rgba(50,25,35,.35);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:20;
+}
+
+.history-panel.show{
+    display:flex;
+}
+
+.history-box{
+    width:min(100%,720px);
+    max-height:75vh;
+    background:#fff5f9;
+    border-radius:25px 25px 0 0;
+    padding:18px;
+    overflow:auto;
+}
+
+.history-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.history-header h3{
+    margin:0;
+}
+
+.history-item{
+    background:white;
+    border-radius:13px;
+    padding:11px;
+    margin-bottom:8px;
+    cursor:pointer;
+}
+
+.history-expression{
+    color:#96717e;
+    font-size:13px;
+}
+
+.history-result{
+    font-weight:800;
+    margin-top:3px;
+}
+
+/* DARK MODE */
+
+body.dark{
+    --bg:#241b20;
+    --panel:#30242a;
+    --screen:#21191d;
+    --key:#3a2c32;
+    --key2:#49343d;
+    --text:#fff1f6;
+    --muted:#c9a7b4;
+    --pink:#d8799d;
+    --pink-dark:#efabc5;
+    background:#241b20;
+}
+
+body.dark .calculator{
+    border-color:#49333d;
+}
+
+body.dark .small-btn{
+    background:#3b2b32;
+    color:#f1abc5;
+}
+
+body.dark .screen{
+    box-shadow:inset 0 0 0 1px #4b333d;
+}
+
+body.dark .result{
+    color:#fff2f7;
+}
+
+body.dark button.key{
+    color:#fff0f5;
+}
+
+body.dark button.key.function{
+    background:#49343d;
+    color:#f0b2c8;
+}
+
+body.dark button.key.operator{
+    background:#694052;
+    color:#fff;
+}
+
+body.dark .mem-btn{
+    background:#49343d;
+    color:#efb3ca;
+}
+
+/* MOBILE */
+
+@media(max-width:520px){
+    body{
+        padding:0;
+        align-items:stretch;
+    }
+
+    .calculator{
+        width:100%;
+        min-height:100vh;
+        border-radius:0;
+    }
+
+    .topbar{
+        padding-top:18px;
+    }
+
+    .screen{
+        min-height:140px;
+    }
+
+    button.key{
+        min-height:50px;
+        font-size:15px;
+        border-radius:13px;
+    }
+
+    button.key.function{
+        font-size:11px;
+    }
+
+    .result{
+        font-size:31px;
+    }
+
+    .expression{
+        font-size:19px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <div class="topbar">
+        <div class="brand">SCIENTIFIC CALCULATOR PRO</div>
+
+        <div class="top-actions">
+            <button class="small-btn" onclick="toggleHistory()">HIST</button>
+            <button class="small-btn" onclick="toggleDark()">☾</button>
+        </div>
+    </div>
+
+    <div class="modes">
+        <button class="mode active" id="degBtn" onclick="setAngle('DEG')">DEG</button>
+        <button class="mode" id="radBtn" onclick="setAngle('RAD')">RAD</button>
+        <button class="mode" id="gradBtn" onclick="setAngle('GRAD')">GRAD</button>
+    </div>
+
+    <div class="screen">
+        <div class="screen-top">
+            <span>SCI</span>
+            <span id="memoryIndicator">M: 0</span>
+        </div>
+
+        <div class="expression" id="expression"></div>
+        <div class="result" id="result">0</div>
+    </div>
+
+    <div class="memory-row">
+        <button class="mem-btn" onclick="memoryClear()">MC</button>
+        <button class="mem-btn" onclick="memoryAdd()">M+</button>
+        <button class="mem-btn" onclick="memorySubtract()">M−</button>
+        <button class="mem-btn" onclick="memoryRecall()">MR</button>
+        <button class="mem-btn" onclick="insert('Ans')">Ans</button>
+        <button class="mem-btn" onclick="insert('π')">π</button>
+    </div>
+
+    <div class="keyboard">
+
+        <div class="row">
+            <button class="key function" onclick="insert('sin(')">sin</button>
+            <button class="key function" onclick="insert('cos(')">cos</button>
+            <button class="key function" onclick="insert('tan(')">tan</button>
+            <button class="key function" onclick="insert('asin(')">sin⁻¹</button>
+            <button class="key function" onclick="insert('acos(')">cos⁻¹</button>
+            <button class="key function" onclick="insert('atan(')">tan⁻¹</button>
+        </div>
+
+        <div class="row">
+            <button class="key function" onclick="insert('sinh(')">sinh</button>
+            <button class="key function" onclick="insert('cosh(')">cosh</button>
+            <button class="key function" onclick="insert('tanh(')">tanh</button>
+            <button class="key function" onclick="insert('log(')">log</button>
+            <button class="key function" onclick="insert('ln(')">ln</button>
+            <button class="key function" onclick="insert('sqrt(')">√</button>
+        </div>
+
+        <div class="row">
+            <button class="key function" onclick="square()">x²</button>
+            <button class="key function" onclick="cube()">x³</button>
+            <button class="key function" onclick="insert('^')">xʸ</button>
+            <button class="key function" onclick="insert('10^')">10ˣ</button>
+            <button class="key function" onclick="insert('abs(')">abs</button>
+            <button class="key function" onclick="factorialAction()">n!</button>
+        </div>
+
+        <div class="row">
+            <button class="key danger" onclick="clearCalculator()">AC</button>
+            <button class="key danger" onclick="deleteLast()">DEL</button>
+            <button class="key operator" onclick="insert('(')">(</button>
+            <button class="key operator" onclick="insert(')')">)</button>
+            <button class="key operator" onclick="insert('%')">%</button>
+            <button class="key operator" onclick="insert('/')">÷</button>
+        </div>
+
+        <div class="row">
+            <button class="key" onclick="insert('7')">7</button>
+            <button class="key" onclick="insert('8')">8</button>
+            <button class="key" onclick="insert('9')">9</button>
+            <button class="key operator" onclick="insert('*')">×</button>
+            <button class="key function" onclick="insert('e')">e</button>
+            <button class="key function" onclick="insert('cbrt(')">∛</button>
+        </div>
+
+        <div class="row">
+            <button class="key" onclick="insert('4')">4</button>
+            <button class="key" onclick="insert('5')">5</button>
+            <button class="key" onclick="insert('6')">6</button>
+            <button class="key operator" onclick="insert('-')">−</button>
+            <button class="key function" onclick="insert('floor(')">floor</button>
+            <button class="key function" onclick="insert('ceil(')">ceil</button>
+        </div>
+
+        <div class="row">
+            <button class="key" onclick="insert('1')">1</button>
+            <button class="key" onclick="insert('2')">2</button>
+            <button class="key" onclick="insert('3')">3</button>
+            <button class="key operator" onclick="insert('+')">+</button>
+            <button class="key function" onclick="insert('round(')">round</button>
+            <button class="key function" onclick="reciprocal()">1/x</button>
+        </div>
+
+        <div class="row">
+            <button class="key" onclick="insert('0')">0</button>
+            <button class="key" onclick="insert('.')">.</button>
+            <button class="key function" onclick="toggleSign()">±</button>
+            <button class="key function" onclick="insert('[')">[ ]</button>
+            <button class="key equal wide" onclick="calculate()">=</button>
+        </div>
+
+        <div class="row">
+            <button class="key function" onclick="insert('gcd(')">gcd</button>
+            <button class="key function" onclick="insert('lcm(')">lcm</button>
+            <button class="key function" onclick="insert('mod(')">mod</button>
+            <button class="key function" onclick="insert('random(')">Rand</button>
+            <button class="key function" onclick="insert('nCr(')">nCr</button>
+            <button class="key function" onclick="insert('nPr(')">nPr</button>
+        </div>
+
+        <div class="row">
+            <button class="key function" onclick="insert('mean(')">mean</button>
+            <button class="key function" onclick="insert('median(')">median</button>
+            <button class="key function" onclick="insert('variance(')">var</button>
+            <button class="key function" onclick="insert('std(')">std</button>
+            <button class="key function" onclick="insert('sum(')">sum</button>
+            <button class="key function" onclick="insert('prod(')">prod</button>
+        </div>
+
+        <div class="row">
+            <button class="key function" onclick="insert('det(')">det</button>
+            <button class="key function" onclick="insert('inverse(')">inv</button>
+            <button class="key function" onclick="insert('transpose(')">T</button>
+            <button class="key function" onclick="insert('i')">i</button>
+            <button class="key function wide" onclick="clearHistory()">Clear history</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- HISTORY -->
+
+<div class="history-panel" id="historyPanel" onclick="closeHistoryOutside(event)">
+    <div class="history-box">
+        <div class="history-header">
+            <h3>Historique</h3>
+            <button class="small-btn" onclick="toggleHistory()">Fermer</button>
+        </div>
+
+        <div id="historyList"></div>
+    </div>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let expression = "";
+let lastAnswer = 0;
+let memory = 0;
+let angleMode = "DEG";
+
+/* =========================================================
+   DISPLAY
+========================================================= */
+
+const expressionEl = document.getElementById("expression");
+const resultEl = document.getElementById("result");
+const memoryEl = document.getElementById("memoryIndicator");
+
+function updateDisplay(){
+    expressionEl.textContent = expression;
+    resultEl.textContent = formatValue(lastAnswer);
+    memoryEl.textContent = "M: " + formatValue(memory);
+}
+
+function formatValue(value){
+
+    if(typeof value === "object" && value !== null && value.type === "complex"){
+        const re = cleanNumber(value.re);
+        const im = cleanNumber(value.im);
+
+        if(Math.abs(im) < 1e-12) return formatNumber(re);
+
+        if(Math.abs(re) < 1e-12){
+            return formatNumber(im) + "i";
+        }
+
+        return formatNumber(re) +
+            (im >= 0 ? " + " : " - ") +
+            formatNumber(Math.abs(im)) + "i";
+    }
+
+    if(Array.isArray(value)){
+        return "[" + value.map(formatValue).join(", ") + "]";
+    }
+
+    if(typeof value !== "number"){
+        return String(value);
+    }
+
+    if(!Number.isFinite(value)){
+        return "Error";
+    }
+
+    return formatNumber(value);
+}
+
+function formatNumber(n){
+
+    n = cleanNumber(n);
+
+    if(Object.is(n,-0)) n = 0;
+
+    if(Math.abs(n) >= 1e12 || (Math.abs(n) > 0 && Math.abs(n) < 1e-9)){
+        return n.toExponential(10)
+            .replace(/\.?0+e/,"e");
+    }
+
+    return Number(n.toPrecision(12)).toString();
+}
+
+function cleanNumber(n){
+    if(typeof n !== "number") return n;
+
+    if(Math.abs(n) < 1e-12) return 0;
+
+    return n;
+}
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+function insert(value){
+    expression += value;
+    expressionEl.textContent = expression;
+}
+
+function clearCalculator(){
+    expression = "";
+    lastAnswer = 0;
+    updateDisplay();
+}
+
+function deleteLast(){
+    expression = expression.slice(0,-1);
+    expressionEl.textContent = expression;
+}
+
+function square(){
+    if(expression) expression = "(" + expression + ")^2";
+    else expression = "Ans^2";
+    expressionEl.textContent = expression;
+}
+
+function cube(){
+    if(expression) expression = "(" + expression + ")^3";
+    else expression = "Ans^3";
+    expressionEl.textContent = expression;
+}
+
+function reciprocal(){
+    if(expression){
+        expression = "1/(" + expression + ")";
+    }else{
+        expression = "1/(Ans)";
+    }
+    expressionEl.textContent = expression;
+}
+
+function factorialAction(){
+    if(expression){
+        expression = "(" + expression + ")!";
+    }else{
+        expression = "Ans!";
+    }
+    expressionEl.textContent = expression;
+}
+
+function toggleSign(){
+
+    if(!expression){
+        expression = "-";
+    }else{
+        expression = "-(" + expression + ")";
+    }
+
+    expressionEl.textContent = expression;
+}
+
+/* =========================================================
+   ANGLE
+========================================================= */
+
+function setAngle(mode){
+
+    angleMode = mode;
+
+    document.querySelectorAll(".mode").forEach(btn=>{
+        btn.classList.remove("active");
+    });
+
+    if(mode === "DEG"){
+        document.getElementById("degBtn").classList.add("active");
+    }
+
+    if(mode === "RAD"){
+        document.getElementById("radBtn").classList.add("active");
+    }
+
+    if(mode === "GRAD"){
+        document.getElementById("gradBtn").classList.add("active");
+    }
+}
+
+/* =========================================================
+   ANGLE FUNCTIONS
+========================================================= */
+
+function toRadians(x){
+
+    if(angleMode === "DEG"){
+        return x * Math.PI / 180;
+    }
+
+    if(angleMode === "GRAD"){
+        return x * Math.PI / 200;
+    }
+
+    return x;
+}
+
+function fromRadians(x){
+
+    if(angleMode === "DEG"){
+        return x * 180 / Math.PI;
+    }
+
+    if(angleMode === "GRAD"){
+        return x * 200 / Math.PI;
+    }
+
+    return x;
+}
+
+/* =========================================================
+   MATH HELPERS
+========================================================= */
+
+function factorial(n){
+
+    if(!Number.isFinite(n) || n < 0 || !Number.isInteger(n)){
+        throw new Error("Factorial");
+    }
+
+    if(n > 170){
+        throw new Error("Too large");
+    }
+
+    let result = 1;
+
+    for(let i=2;i<=n;i++){
+        result *= i;
+    }
+
+    return result;
+}
+
+function combinations(n,r){
+
+    if(!Number.isInteger(n) || !Number.isInteger(r)){
+        throw new Error("nCr");
+    }
+
+    if(n < 0 || r < 0 || r > n){
+        throw new Error("nCr");
+    }
+
+    r = Math.min(r,n-r);
+
+    let result = 1;
+
+    for(let i=1;i<=r;i++){
+        result = result * (n-r+i) / i;
+    }
+
+    return result;
+}
+
+function permutations(n,r){
+
+    if(!Number.isInteger(n) || !Number.isInteger(r)){
+        throw new Error("nPr");
+    }
+
+    if(n < 0 || r < 0 || r > n){
+        throw new Error("nPr");
+    }
+
+    let result = 1;
+
+    for(let i=0;i<r;i++){
+        result *= n-i;
+    }
+
+    return result;
+}
+
+function gcd(a,b){
+
+    a = Math.abs(Math.trunc(a));
+    b = Math.abs(Math.trunc(b));
+
+    while(b){
+        [a,b] = [b,a%b];
+    }
+
+    return a;
+}
+
+function lcm(a,b){
+
+    if(a === 0 || b === 0) return 0;
+
+    return Math.abs(a*b) / gcd(a,b);
+}
+
+function flattenArray(a){
+
+    if(!Array.isArray(a)){
+        return [a];
+    }
+
+    return a.flat(Infinity);
+}
+
+function mean(a){
+
+    a = flattenArray(a);
+
+    if(!a.length) throw new Error("mean");
+
+    return a.reduce((x,y)=>x+y,0) / a.length;
+}
+
+function median(a){
+
+    a = flattenArray(a).slice().sort((x,y)=>x-y);
+
+    if(!a.length) throw new Error("median");
+
+    const mid = Math.floor(a.length/2);
+
+    return a.length % 2
+        ? a[mid]
+        : (a[mid-1] + a[mid])/2;
+}
+
+function variance(a){
+
+    a = flattenArray(a);
+
+    if(!a.length) throw new Error("variance");
+
+    const m = mean(a);
+
+    return a.reduce((s,x)=>s+(x-m)**2,0) / a.length;
+}
+
+function std(a){
+    return Math.sqrt(variance(a));
+}
+
+function sum(a){
+    return flattenArray(a).reduce((x,y)=>x+y,0);
+}
+
+function prod(a){
+    return flattenArray(a).reduce((x,y)=>x*y,1);
+}
+
+/* =========================================================
+   MATRIX
+========================================================= */
+
+function determinant(m){
+
+    if(!Array.isArray(m) || !m.length){
+        throw new Error("Matrix");
+    }
+
+    const n = m.length;
+
+    if(!m.every(row=>Array.isArray(row) && row.length===n)){
+        throw new Error("Matrix");
+    }
+
+    if(n === 1) return m[0][0];
+
+    if(n === 2){
+        return m[0][0]*m[1][1] -
+               m[0][1]*m[1][0];
+    }
+
+    let det = 0;
+
+    for(let c=0;c<n;c++){
+
+        const minor = m.slice(1).map(row =>
+            row.filter((_,j)=>j!==c)
+        );
+
+        det += (c%2===0 ? 1:-1) *
+               m[0][c] *
+               determinant(minor);
+    }
+
+    return det;
+}
+
+function transpose(m){
+
+    if(!Array.isArray(m) || !m.length){
+        throw new Error("Matrix");
+    }
+
+    return m[0].map((_,i)=>m.map(row=>row[i]));
+}
+
+function inverseMatrix(m){
+
+    if(!Array.isArray(m) || !m.length){
+        throw new Error("Matrix");
+    }
+
+    const n = m.length;
+
+    if(!m.every(row=>Array.isArray(row) && row.length===n)){
+        throw new Error("Matrix");
+    }
+
+    const a = m.map((row,i)=>[
+        ...row.map(Number),
+        ...Array.from({length:n},(_,j)=>i===j?1:0)
+    ]);
+
+    for(let col=0;col<n;col++){
+
+        let pivot = col;
+
+        for(let row=col+1;row<n;row++){
+
+            if(Math.abs(a[row][col]) >
+               Math.abs(a[pivot][col])){
+                pivot=row;
+            }
+        }
+
+        if(Math.abs(a[pivot][col]) < 1e-14){
+            throw new Error("No inverse");
+        }
+
+        [a[col],a[pivot]]=[a[pivot],a[col]];
+
+        const divisor=a[col][col];
+
+        for(let j=0;j<2*n;j++){
+            a[col][j]/=divisor;
+        }
+
+        for(let row=0;row<n;row++){
+
+            if(row===col) continue;
+
+            const factor=a[row][col];
+
+            for(let j=0;j<2*n;j++){
+                a[row][j]-=factor*a[col][j];
+            }
+        }
+    }
+
+    return a.map(row=>row.slice(n));
+}
+
+/* =========================================================
+   COMPLEX
+========================================================= */
+
+function complexValue(re,im=0){
+    return {
+        type:"complex",
+        re,
+        im
+    };
+}
+
+function isComplex(x){
+    return x &&
+           typeof x==="object" &&
+           x.type==="complex";
+}
+
+function complexAdd(a,b){
+    return complexValue(a.re+b.re,a.im+b.im);
+}
+
+function complexSub(a,b){
+    return complexValue(a.re-b.re,a.im-b.im);
+}
+
+function complexMul(a,b){
+
+    return complexValue(
+        a.re*b.re-a.im*b.im,
+        a.re*b.im+a.im*b.re
+    );
+}
+
+function complexDiv(a,b){
+
+    const d=b.re*b.re+b.im*b.im;
+
+    if(d===0) throw new Error("Division");
+
+    return complexValue(
+        (a.re*b.re+a.im*b.im)/d,
+        (a.im*b.re-a.re*b.im)/d
+    );
+}
+
+function complexPow(a,b){
+
+    if(b.im===0){
+
+        const r=Math.hypot(a.re,a.im);
+        const theta=Math.atan2(a.im,a.re);
+
+        const magnitude=Math.pow(r,b.re);
+        const angle=theta*b.re;
+
+        return complexValue(
+            magnitude*Math.cos(angle),
+            magnitude*Math.sin(angle)
+        );
+    }
+
+    throw new Error("Complex power");
+}
+
+/* =========================================================
+   TOKENIZER / PARSER
+========================================================= */
+
+class Parser{
+
+    constructor(text){
+        this.text=text;
+        this.pos=0;
+    }
+
+    skipSpaces(){
+        while(/\s/.test(this.text[this.pos]||"")){
+            this.pos++;
+        }
+    }
+
+    match(char){
+
+        this.skipSpaces();
+
+        if(this.text[this.pos]===char){
+            this.pos++;
+            return true;
+        }
+
+        return false;
+    }
+
+    parse(){
+
+        const value=this.additive();
+
+        this.skipSpaces();
+
+        if(this.pos < this.text.length){
+            throw new Error("Syntax");
+        }
+
+        return value;
+    }
+
+    additive(){
+
+        let value=this.multiplicative();
+
+        while(true){
+
+            if(this.match("+")){
+                value=this.add(value,this.multiplicative());
+            }
+            else if(this.match("-")){
+                value=this.sub(value,this.multiplicative());
+            }
+            else{
+                break;
+            }
+        }
+
+        return value;
+    }
+
+    multiplicative(){
+
+        let value=this.power();
+
+        while(true){
+
+            if(this.match("*")){
+                value=this.mul(value,this.power());
+            }
+            else if(this.match("/")){
+                value=this.div(value,this.power());
+            }
+            else{
+                break;
+            }
+        }
+
+        return value;
+    }
+
+    power(){
+
+        let value=this.unary();
+
+        if(this.match("^")){
+            value=this.pow(value,this.power());
+        }
+
+        return value;
+    }
+
+    unary(){
+
+        this.skipSpaces();
+
+        if(this.match("+")){
+            return this.unary();
+        }
+
+        if(this.match("-")){
+            return this.neg(this.unary());
+        }
+
+        return this.postfix();
+    }
+
+    postfix(){
+
+        let value=this.primary();
+
+        while(true){
+
+            if(this.match("!")){
+                value=factorial(value);
+            }
+            else if(this.match("%")){
+                value=this.div(value,100);
+            }
+            else{
+                break;
+            }
+        }
+
+        return value;
+    }
+
+    primary(){
+
+        this.skipSpaces();
+
+        const ch=this.text[this.pos];
+
+        if(ch==="("){
+
+            this.pos++;
+
+            const value=this.additive();
+
+            if(!this.match(")")){
+                throw new Error(")");
+            }
+
+            return value;
+        }
+
+        if(ch==="["){
+            return this.parseArray();
+        }
+
+        if(/[0-9.]/.test(ch)){
+            return this.parseNumber();
+        }
+
+        if(/[A-Za-zπ]/.test(ch)){
+            return this.parseIdentifier();
+        }
+
+        throw new Error("Unexpected");
+    }
+
+    parseNumber(){
+
+        this.skipSpaces();
+
+        const start=this.pos;
+
+        while(/[0-9.]/.test(this.text[this.pos]||"")){
+            this.pos++;
+        }
+
+        if(this.text[this.pos]==="e" || this.text[this.pos]==="E"){
+
+            this.pos++;
+
+            if(this.text[this.pos]==="+" ||
+               this.text[this.pos]==="-"){
+                this.pos++;
+            }
+
+            while(/[0-9]/.test(this.text[this.pos]||"")){
+                this.pos++;
+            }
+        }
+
+        const n=Number(this.text.slice(start,this.pos));
+
+        if(Number.isNaN(n)){
+            throw new Error("Number");
+        }
+
+        return n;
+    }
+
+    parseIdentifier(){
+
+        this.skipSpaces();
+
+        const start=this.pos;
+
+        while(/[A-Za-z0-9_π]/.test(this.text[this.pos]||"")){
+            this.pos++;
+        }
+
+        const name=this.text.slice(start,this.pos);
+
+        this.skipSpaces();
+
+        if(this.match("(")){
+
+            const args=[];
+
+            this.skipSpaces();
+
+            if(!this.match(")")){
+
+                while(true){
+
+                    args.push(this.additive());
+
+                    if(this.match(")")) break;
+
+                    if(!this.match(",")){
+                        throw new Error(",");
+                    }
+                }
+            }
+
+            return this.callFunction(name,args);
+        }
+
+        if(name==="pi" || name==="π") return Math.PI;
+        if(name==="e") return Math.E;
+        if(name==="i") return complexValue(0,1);
+        if(name==="Ans") return lastAnswer;
+
+        throw new Error("Unknown");
+    }
+
+    parseArray(){
+
+        if(!this.match("[")){
+            throw new Error("[");
+        }
+
+        const arr=[];
+
+        this.skipSpaces();
+
+        if(this.match("]")){
+            return arr;
+        }
+
+        while(true){
+
+            arr.push(this.additive());
+
+            if(this.match("]")) break;
+
+            if(!this.match(",")){
+                throw new Error(",");
+            }
+        }
+
+        return arr;
+    }
+
+    add(a,b){
+
+        if(isComplex(a)&&isComplex(b)) return complexAdd(a,b);
+        if(isComplex(a)) return complexAdd(a,complexValue(b));
+        if(isComplex(b)) return complexAdd(complexValue(a),b);
+
+        return a+b;
+    }
+
+    sub(a,b){
+
+        if(isComplex(a)&&isComplex(b)) return complexSub(a,b);
+        if(isComplex(a)) return complexSub(a,complexValue(b));
+        if(isComplex(b)) return complexSub(complexValue(a),b);
+
+        return a-b;
+    }
+
+    mul(a,b){
+
+        if(isComplex(a)&&isComplex(b)) return complexMul(a,b);
+        if(isComplex(a)) return complexMul(a,complexValue(b));
+        if(isComplex(b)) return complexMul(complexValue(a),b);
+
+        return a*b;
+    }
+
+    div(a,b){
+
+        if(isComplex(a)&&isComplex(b)) return complexDiv(a,b);
+        if(isComplex(a)) return complexDiv(a,complexValue(b));
+        if(isComplex(b)) return complexDiv(complexValue(a),b);
+
+        if(b===0) throw new Error("Division");
+
+        return a/b;
+    }
+
+    pow(a,b){
+
+        if(isComplex(a)||isComplex(b)){
+
+            if(!isComplex(a)) a=complexValue(a);
+            if(!isComplex(b)) b=complexValue(b);
+
+            return complexPow(a,b);
+        }
+
+        return Math.pow(a,b);
+    }
+
+    neg(a){
+
+        if(isComplex(a)){
+            return complexValue(-a.re,-a.im);
+        }
+
+        return -a;
+    }
+
+    callFunction(name,args){
+
+        const x=args[0];
+
+        switch(name){
+
+            case "sin":
+                return Math.sin(toRadians(x));
+
+            case "cos":
+                return Math.cos(toRadians(x));
+
+            case "tan":
+                return Math.tan(toRadians(x));
+
+            case "asin":
+                return fromRadians(Math.asin(x));
+
+            case "acos":
+                return fromRadians(Math.acos(x));
+
+            case "atan":
+                return fromRadians(Math.atan(x));
+
+            case "sinh":
+                return Math.sinh(x);
+
+            case "cosh":
+                return Math.cosh(x);
+
+            case "tanh":
+                return Math.tanh(x);
+
+            case "asinh":
+                return Math.asinh(x);
+
+            case "acosh":
+                return Math.acosh(x);
+
+            case "atanh":
+                return Math.atanh(x);
+
+            case "log":
+            case "log10":
+                return Math.log10(x);
+
+            case "ln":
+                return Math.log(x);
+
+            case "sqrt":
+                return Math.sqrt(x);
+
+            case "cbrt":
+                return Math.cbrt(x);
+
+            case "abs":
+                return Math.abs(x);
+
+            case "floor":
+                return Math.floor(x);
+
+            case "ceil":
+                return Math.ceil(x);
+
+            case "round":
+                return Math.round(x);
+
+            case "random":
+                return Math.random();
+
+            case "gcd":
+                return gcd(args[0],args[1]);
+
+            case "lcm":
+                return lcm(args[0],args[1]);
+
+            case "mod":
+                return args[0] % args[1];
+
+            case "nCr":
+                return combinations(args[0],args[1]);
+
+            case "nPr":
+                return permutations(args[0],args[1]);
+
+            case "mean":
+                return mean(args[0]);
+
+            case "median":
+                return median(args[0]);
+
+            case "variance":
+                return variance(args[0]);
+
+            case "std":
+                return std(args[0]);
+
+            case "sum":
+                return sum(args[0]);
+
+            case "prod":
+                return prod(args[0]);
+
+            case "det":
+                return determinant(args[0]);
+
+            case "inverse":
+                return inverseMatrix(args[0]);
+
+            case "transpose":
+                return transpose(args[0]);
+
+            default:
+                throw new Error("Function");
+        }
+    }
+}
+
+/* =========================================================
+   EVALUATION
+========================================================= */
+
+function evaluate(text){
+
+    text=text.trim();
+
+    if(!text){
+        return lastAnswer;
+    }
+
+    const parser=new Parser(text);
+
+    const value=parser.parse();
+
+    if(typeof value==="number" && !Number.isFinite(value)){
+        throw new Error("Math");
+    }
+
+    return value;
+}
+
+function calculate(){
+
+    if(!expression.trim()){
+        return;
+    }
+
+    try{
+
+        const value=evaluate(expression);
+
+        lastAnswer=value;
+
+        addHistory(expression,value);
+
+        resultEl.textContent=formatValue(value);
+
+    }catch(error){
+
+        resultEl.textContent="Error";
+
+    }
+}
+
+/* =========================================================
+   MEMORY
+========================================================= */
+
+function getNumericAnswer(){
+
+    let value;
+
+    try{
+        value=evaluate(expression || "Ans");
+    }catch{
+        value=lastAnswer;
+    }
+
+    if(typeof value!=="number"){
+        throw new Error("Memory");
+    }
+
+    return value;
+}
+
+function memoryAdd(){
+
+    try{
+        memory += getNumericAnswer();
+        updateDisplay();
+    }catch{}
+}
+
+function memorySubtract(){
+
+    try{
+        memory -= getNumericAnswer();
+        updateDisplay();
+    }catch{}
+}
+
+function memoryRecall(){
+
+    expression += formatNumber(memory);
+    expressionEl.textContent=expression;
+}
+
+function memoryClear(){
+
+    memory=0;
+    updateDisplay();
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function getHistory(){
+
+    try{
+        return JSON.parse(
+            localStorage.getItem("scientificHistory") || "[]"
+        );
+    }catch{
+        return [];
+    }
+}
+
+function addHistory(exp,result){
+
+    const history=getHistory();
+
+    history.unshift({
+        expression:exp,
+        result:formatValue(result)
+    });
+
+    localStorage.setItem(
+        "scientificHistory",
+        JSON.stringify(history.slice(0,50))
+    );
+
+    renderHistory();
+}
+
+function renderHistory(){
+
+    const list=document.getElementById("historyList");
+
+    const history=getHistory();
+
+    if(!history.length){
+        list.innerHTML="<p style='color:#987783'>Aucun calcul.</p>";
+        return;
+    }
+
+    list.innerHTML=history.map((item,index)=>`
+
+        <div class="history-item"
+             onclick="useHistory(${index})">
+
+            <div class="history-expression">
+                ${escapeHtml(item.expression)}
+            </div>
+
+            <div class="history-result">
+                = ${escapeHtml(item.result)}
+            </div>
+
+        </div>
+
+    `).join("");
+}
+
+function useHistory(index){
+
+    const history=getHistory();
+
+    if(!history[index]) return;
+
+    expression=history[index].expression;
+
+    expressionEl.textContent=expression;
+
+    toggleHistory();
+}
+
+function clearHistory(){
+
+    localStorage.removeItem("scientificHistory");
+
+    renderHistory();
+}
+
+function escapeHtml(text){
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+}
+
+function toggleHistory(){
+
+    const panel=document.getElementById("historyPanel");
+
+    panel.classList.toggle("show");
+
+    if(panel.classList.contains("show")){
+        renderHistory();
+    }
+}
+
+function closeHistoryOutside(event){
+
+    if(event.target.id==="historyPanel"){
+        toggleHistory();
+    }
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+function toggleDark(){
+
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "calculatorDark",
+        document.body.classList.contains("dark")
+    );
+}
+
+if(localStorage.getItem("calculatorDark")==="true"){
+    document.body.classList.add("dark");
+}
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener("keydown",function(e){
+
+    const key=e.key;
+
+    if(/[0-9.]/.test(key)){
+        insert(key);
+        return;
+    }
+
+    if(["+","-","*","/","^","(",")",",","%"].includes(key)){
+        insert(key);
+        return;
+    }
+
+    if(key==="Enter" || key==="="){
+        e.preventDefault();
+        calculate();
+        return;
+    }
+
+    if(key==="Backspace"){
+        deleteLast();
+        return;
+    }
+
+    if(key==="Escape"){
+        clearCalculator();
+        return;
+    }
+});
+
+/* =========================================================
+   START
+========================================================= */
+
+updateDisplay();
+renderHistory();
+
+</script>
+
+</body>
+</html>
